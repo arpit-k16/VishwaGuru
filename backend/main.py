@@ -47,9 +47,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def root():
+    return {
+        "status": "ok",
+        "service": "VishwaGuru API",
+        "version": "1.0.0"
+    }
+
 @app.get("/health")
-def health_check():
-    return {"status": "ok"}
+def health():
+    return {"status": "healthy"}
 
 def save_file_blocking(file_obj, path):
     with open(path, "wb") as buffer:
