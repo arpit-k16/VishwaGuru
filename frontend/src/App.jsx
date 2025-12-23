@@ -358,7 +358,7 @@ function App() {
           Civic action, simplified.
         </p>
 
-        {loading && view !== 'report' && view !== 'mh-rep' && <p className="text-center text-gray-500 my-4">Loading...</p>}
+        {loading && !['report', 'mh-rep'].includes(view) && <p className="text-center text-gray-500 my-4">Loading...</p>}
         {error && <p className="text-center text-red-500 my-4">{error}</p>}
 
         {view === 'home' && <Home />}

@@ -14,6 +14,25 @@ if api_key:
     genai.configure(api_key=api_key)
 
 
+def _get_fallback_summary(mla_name: str, assembly_constituency: str, district: str) -> str:
+    """
+    Generate a fallback summary when Gemini is unavailable or fails.
+    
+    Args:
+        mla_name: Name of the MLA
+        assembly_constituency: Assembly constituency name
+        district: District name
+        
+    Returns:
+        A simple fallback description
+    """
+    return (
+        f"{mla_name} represents the {assembly_constituency} assembly constituency "
+        f"in {district} district, Maharashtra. MLAs handle local issues such as "
+        f"infrastructure, public services, and constituent welfare."
+    )
+
+
 async def generate_mla_summary(
     district: str,
     assembly_constituency: str,
@@ -33,11 +52,7 @@ async def generate_mla_summary(
         A short paragraph describing the MLA's role and responsibilities
     """
     if not api_key:
-        return (
-            f"{mla_name} represents the {assembly_constituency} assembly constituency "
-            f"in {district} district, Maharashtra. MLAs handle local issues such as "
-            f"infrastructure, public services, and constituent welfare."
-        )
+        return _get_fallback_summary(mla_name, assembly_constituency, district)
     
     try:
         model = genai.GenerativeModel('gemini-pro')
@@ -60,8 +75,4 @@ async def generate_mla_summary(
     except Exception as e:
         print(f"Gemini Summary Error: {e}")
         # Fallback to simple description
-        return (
-            f"{mla_name} represents the {assembly_constituency} assembly constituency "
-            f"in {district} district, Maharashtra. MLAs handle local issues such as "
-            f"infrastructure, public services, and constituent welfare."
-        )
+        return _get_fallback_summary(mla_name, assembly_constituency, district)
