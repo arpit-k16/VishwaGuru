@@ -10,3 +10,4 @@ ultralyticsplus==0.0.28
 ultralytics
 opencv-python-headless
 huggingface-hub
+httpx

@@ -24,6 +24,7 @@ from contextlib import asynccontextmanager
 from bot import run_bot
 from pothole_detection import detect_potholes
 from garbage_detection import detect_garbage
+from vandalism_detection import detect_vandalism
 from PIL import Image
 import io
 from sqlalchemy import text
@@ -261,6 +262,29 @@ async def detect_pothole_endpoint(image: UploadFile = File(...)):
     except Exception as e:
         print(f"Detection error: {e}")
         raise HTTPException(status_code=500, detail="Error processing image for detection")
+
+    return {"detections": detections}
+
+@app.post("/api/detect-vandalism")
+async def detect_vandalism_endpoint(image: UploadFile = File(...)):
+    # Read image
+    contents = await image.read()
+    # Convert to PIL Image
+    try:
+        pil_image = Image.open(io.BytesIO(contents))
+    except Exception:
+         raise HTTPException(status_code=400, detail="Invalid image file")
+
+    # Run detection (blocking, so run in threadpool)
+    # Using HF API, which is network bound, but we still run it in threadpool
+    # to avoid blocking the event loop if it was synchronous code.
+    # However, hf_service uses sync calls (InferenceClient), so wrapping in threadpool is correct.
+    try:
+        detections = await run_in_threadpool(detect_vandalism, pil_image)
+    except Exception as e:
+        print(f"Detection error: {e}")
+        # Return empty detections on error instead of 500 to keep UI responsive
+        return {"detections": [], "error": str(e)}
 
     return {"detections": detections}
 

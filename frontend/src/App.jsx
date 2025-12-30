@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { getMaharashtraRepContacts } from './api/location';
 import PotholeDetector from './PotholeDetector';
 import GarbageDetector from './GarbageDetector';
+import VandalismDetector from './VandalismDetector';
 import ChatWidget from './components/ChatWidget';
-import { AlertTriangle, MapPin, Search, Activity, Camera, Trash2, ThumbsUp } from 'lucide-react';
+import { AlertTriangle, MapPin, Search, Activity, Camera, Trash2, ThumbsUp, Brush } from 'lucide-react';
 
 // Get API URL from environment variable, fallback to relative URL for local dev
 const API_URL = import.meta.env.VITE_API_URL || '';
@@ -52,9 +53,19 @@ const Home = ({ setView, fetchResponsibilityMap, recentIssues, handleUpvote }) =
         </div>
         <span className="font-semibold text-purple-800">Find MLA</span>
       </button>
+
+      <button
+        onClick={() => setView('vandalism')}
+        className="flex flex-col items-center justify-center bg-indigo-50 border-2 border-indigo-100 p-4 rounded-xl hover:bg-indigo-100 transition shadow-sm h-32"
+      >
+        <div className="bg-indigo-500 text-white p-3 rounded-full mb-2">
+          <Brush size={24} />
+        </div>
+        <span className="font-semibold text-indigo-800">Report Graffiti</span>
+      </button>
     </div>
 
-    <div className="grid grid-cols-1">
+    <div className="grid grid-cols-1 mt-4">
        <button
         onClick={fetchResponsibilityMap}
         className="flex flex-row items-center justify-center bg-green-50 border-2 border-green-100 p-4 rounded-xl hover:bg-green-100 transition shadow-sm h-16"
@@ -539,6 +550,14 @@ function App() {
         )}
         {view === 'pothole' && <PotholeDetector onBack={() => setView('home')} />}
         {view === 'garbage' && <GarbageDetector onBack={() => setView('home')} />}
+        {view === 'vandalism' && (
+          <div className="flex flex-col h-full">
+            <button onClick={() => setView('home')} className="self-start text-blue-600 mb-2">
+               &larr; Back
+            </button>
+            <VandalismDetector />
+          </div>
+        )}
 
       </div>
     </div>
