@@ -28,48 +28,16 @@ from vandalism_detection import detect_vandalism
 from flooding_detection import detect_flooding
 from infrastructure_detection import detect_infrastructure
 from PIL import Image
-from sqlalchemy import text
+from init_db import migrate_db
 
 # Create tables if they don't exist
 Base.metadata.create_all(bind=engine)
 
-# Attempt to migrate schema (add upvotes column if missing)
-# This is a simple MVP migration strategy
-try:
-    with engine.connect() as conn:
-        conn.execute(text("ALTER TABLE issues ADD COLUMN upvotes INTEGER DEFAULT 0"))
-        # Check if index exists or create it
-        try:
-            conn.execute(text("CREATE INDEX ix_issues_upvotes ON issues (upvotes)"))
-            print("Migrated database: Added index on upvotes column.")
-        except Exception:
-            # Index likely already exists
-            pass
-
-        # Add index on created_at for faster sorting
-        try:
-            conn.execute(text("CREATE INDEX ix_issues_created_at ON issues (created_at)"))
-            print("Migrated database: Added index on created_at column.")
-        except Exception:
-            # Index likely already exists
-            pass
-
-        # Add index on status for faster filtering
-        try:
-            conn.execute(text("CREATE INDEX ix_issues_status ON issues (status)"))
-            print("Migrated database: Added index on status column.")
-        except Exception:
-            # Index likely already exists
-            pass
-
-        conn.commit()
-        print("Migrated database: Added upvotes column.")
-except Exception as e:
-    # Column likely already exists
-    pass
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Startup: Migrate DB
+    migrate_db()
+
     # Startup: Load static data to avoid first-request latency
     try:
         # These functions use lru_cache, so calling them once loads the data into memory
