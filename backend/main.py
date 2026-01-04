@@ -29,6 +29,7 @@ from hf_service import detect_vandalism_clip, detect_flooding_clip, detect_infra
 from PIL import Image
 from init_db import migrate_db
 import logging
+import time
 
 # Configure structured logging
 logging.basicConfig(
@@ -36,6 +37,13 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Simple in-memory cache
+RECENT_ISSUES_CACHE = {
+    "data": None,
+    "timestamp": 0,
+    "ttl": 60  # seconds
+}
 
 # Create tables if they don't exist
 Base.metadata.create_all(bind=engine)
@@ -225,10 +233,14 @@ async def chat_endpoint(request: ChatRequest):
 
 @app.get("/api/issues/recent")
 def get_recent_issues(db: Session = Depends(get_db)):
+    current_time = time.time()
+    if RECENT_ISSUES_CACHE["data"] and (current_time - RECENT_ISSUES_CACHE["timestamp"] < RECENT_ISSUES_CACHE["ttl"]):
+        return RECENT_ISSUES_CACHE["data"]
+
     # Fetch last 10 issues
     issues = db.query(Issue).order_by(Issue.created_at.desc()).limit(10).all()
     # Sanitize data (no emails)
-    return [
+    data = [
         {
             "id": i.id,
             "category": i.category,
@@ -240,6 +252,11 @@ def get_recent_issues(db: Session = Depends(get_db)):
         }
         for i in issues
     ]
+
+    RECENT_ISSUES_CACHE["data"] = data
+    RECENT_ISSUES_CACHE["timestamp"] = current_time
+
+    return data
 
 @app.post("/api/detect-pothole")
 async def detect_pothole_endpoint(image: UploadFile = File(...)):
