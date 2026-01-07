@@ -11,3 +11,4 @@ ultralytics
 opencv-python-headless
 huggingface-hub
 httpx
+python-magic

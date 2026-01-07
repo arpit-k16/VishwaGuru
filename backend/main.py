@@ -30,6 +30,7 @@ from PIL import Image
 from init_db import migrate_db
 import logging
 import time
+import magic
 
 # Configure structured logging
 logging.basicConfig(
@@ -37,6 +38,58 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# File upload validation constants
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+ALLOWED_MIME_TYPES = {
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'image/bmp',
+    'image/tiff'
+}
+
+def validate_uploaded_file(file: UploadFile) -> None:
+    """
+    Validate uploaded file for security and safety.
+    
+    Args:
+        file: The uploaded file to validate
+        
+    Raises:
+        HTTPException: If validation fails
+    """
+    # Check file size
+    file.file.seek(0, 2)  # Seek to end
+    file_size = file.file.tell()
+    file.file.seek(0)  # Reset to beginning
+    
+    if file_size > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=413, 
+            detail=f"File too large. Maximum size allowed is {MAX_FILE_SIZE // (1024*1024)}MB"
+        )
+    
+    # Check MIME type from content using python-magic
+    try:
+        # Read first 1024 bytes for MIME detection
+        file_content = file.file.read(1024)
+        file.file.seek(0)  # Reset file pointer
+        
+        detected_mime = magic.from_buffer(file_content, mime=True)
+        
+        if detected_mime not in ALLOWED_MIME_TYPES:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid file type. Only image files are allowed. Detected: {detected_mime}"
+            )
+    except Exception as e:
+        logger.error(f"Error validating file {file.filename}: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail="Unable to validate file content. Please ensure it's a valid image file."
+        )
 
 # Simple in-memory cache
 RECENT_ISSUES_CACHE = {
@@ -149,6 +202,10 @@ async def create_issue(
     db: Session = Depends(get_db)
 ):
     try:
+        # Validate uploaded image if provided
+        if image:
+            validate_uploaded_file(image)
+        
         # Save image if provided
         image_path = None
         if image:
@@ -260,6 +317,9 @@ def get_recent_issues(db: Session = Depends(get_db)):
 
 @app.post("/api/detect-pothole")
 async def detect_pothole_endpoint(image: UploadFile = File(...)):
+    # Validate uploaded file
+    validate_uploaded_file(image)
+    
     # Convert to PIL Image directly from file object to save memory
     try:
         pil_image = await run_in_threadpool(Image.open, image.file)
@@ -277,6 +337,9 @@ async def detect_pothole_endpoint(image: UploadFile = File(...)):
 
 @app.post("/api/detect-infrastructure")
 async def detect_infrastructure_endpoint(image: UploadFile = File(...)):
+    # Validate uploaded file
+    validate_uploaded_file(image)
+    
     # Convert to PIL Image directly from file object to save memory
     try:
         pil_image = await run_in_threadpool(Image.open, image.file)
@@ -294,6 +357,9 @@ async def detect_infrastructure_endpoint(image: UploadFile = File(...)):
 
 @app.post("/api/detect-flooding")
 async def detect_flooding_endpoint(image: UploadFile = File(...)):
+    # Validate uploaded file
+    validate_uploaded_file(image)
+    
     # Convert to PIL Image directly from file object to save memory
     try:
         pil_image = await run_in_threadpool(Image.open, image.file)
@@ -311,6 +377,9 @@ async def detect_flooding_endpoint(image: UploadFile = File(...)):
 
 @app.post("/api/detect-vandalism")
 async def detect_vandalism_endpoint(image: UploadFile = File(...)):
+    # Validate uploaded file
+    validate_uploaded_file(image)
+    
     # Convert to PIL Image directly from file object to save memory
     try:
         pil_image = await run_in_threadpool(Image.open, image.file)
@@ -328,6 +397,9 @@ async def detect_vandalism_endpoint(image: UploadFile = File(...)):
 
 @app.post("/api/detect-garbage")
 async def detect_garbage_endpoint(image: UploadFile = File(...)):
+    # Validate uploaded file
+    validate_uploaded_file(image)
+    
     # Convert to PIL Image directly from file object to save memory
     try:
         pil_image = await run_in_threadpool(Image.open, image.file)
