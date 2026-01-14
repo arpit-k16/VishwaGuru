@@ -3,9 +3,13 @@ import os
 import warnings
 from functools import lru_cache
 from typing import Optional
+import logging
 
 import google.generativeai as genai
 from async_lru import alru_cache
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 # Suppress deprecation warnings from google.generativeai
 warnings.filterwarnings("ignore", category=FutureWarning, module="google.generativeai")
@@ -96,7 +100,7 @@ async def generate_action_plan(issue_description: str, category: str, image_path
             plan = json.loads(text_response)
         except json.JSONDecodeError:
             # Try to fix common JSON errors if possible, or fallback
-            print(f"Gemini returned invalid JSON: {text_response}")
+            logger.error(f"Gemini returned invalid JSON: {text_response}")
             raise Exception("Invalid JSON from AI")
 
         if "x_post" not in plan or not plan.get("x_post"):
@@ -104,7 +108,7 @@ async def generate_action_plan(issue_description: str, category: str, image_path
         return plan
 
     except Exception as e:
-        print(f"Gemini Error: {e}")
+        logger.error(f"Gemini Error: {e}")
         # Fallback
         return {
             "whatsapp": f"Hello, I would like to report a {category} issue: {issue_description}",
@@ -136,5 +140,5 @@ async def chat_with_civic_assistant(query: str) -> str:
         response = await model.generate_content_async(prompt)
         return response.text.strip()
     except Exception as e:
-        print(f"Gemini Chat Error: {e}")
+        logger.error(f"Gemini Chat Error: {e}")
         return "I encountered an error processing your request."

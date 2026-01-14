@@ -8,6 +8,10 @@ import google.generativeai as genai
 from typing import Dict, Optional
 import warnings
 from async_lru import alru_cache
+import logging
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 # Suppress deprecation warnings from google.generativeai
 warnings.filterwarnings("ignore", category=FutureWarning, module="google.generativeai")
@@ -80,6 +84,6 @@ async def generate_mla_summary(
         return response.text.strip()
         
     except Exception as e:
-        print(f"Gemini Summary Error: {e}")
+        logger.error(f"Gemini Summary Error: {e}")
         # Fallback to simple description
         return _get_fallback_summary(mla_name, assembly_constituency, district)

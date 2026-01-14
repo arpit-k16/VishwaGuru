@@ -4,6 +4,10 @@ import httpx
 from PIL import Image
 import asyncio
 from typing import Union
+import logging
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 # HF_TOKEN is optional for public models but recommended for higher limits
 token = os.environ.get("HF_TOKEN")
@@ -34,11 +38,11 @@ async def _make_request(client, image_bytes, labels):
     try:
         response = await client.post(API_URL, headers=headers, json=payload, timeout=20.0)
         if response.status_code != 200:
-            print(f"HF API Error: {response.status_code} - {response.text}")
+            logger.error(f"HF API Error: {response.status_code} - {response.text}")
             return []
         return response.json()
     except Exception as e:
-        print(f"HF API Request Exception: {e}")
+        logger.error(f"HF API Request Exception: {e}")
         return []
 
 def _prepare_image_bytes(image: Union[Image.Image, bytes]) -> bytes:
@@ -82,7 +86,7 @@ async def detect_vandalism_clip(image: Union[Image.Image, bytes], client: httpx.
                  })
         return detected
     except Exception as e:
-        print(f"HF Detection Error: {e}")
+        logger.error(f"HF Detection Error: {e}")
         return []
 
 async def detect_tree_hazard_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
@@ -108,7 +112,7 @@ async def detect_tree_hazard_clip(image: Union[Image.Image, bytes], client: http
                  })
         return detected
     except Exception as e:
-        print(f"HF Detection Error: {e}")
+        logger.error(f"HF Detection Error: {e}")
         return []
 
 async def detect_pest_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
@@ -134,7 +138,7 @@ async def detect_pest_clip(image: Union[Image.Image, bytes], client: httpx.Async
                  })
         return detected
     except Exception as e:
-        print(f"HF Detection Error: {e}")
+        logger.error(f"HF Detection Error: {e}")
         return []
 
 async def detect_infrastructure_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
@@ -160,7 +164,7 @@ async def detect_infrastructure_clip(image: Union[Image.Image, bytes], client: h
                  })
         return detected
     except Exception as e:
-        print(f"HF Detection Error: {e}")
+        logger.error(f"HF Detection Error: {e}")
         return []
 
 async def detect_flooding_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
@@ -186,7 +190,7 @@ async def detect_flooding_clip(image: Union[Image.Image, bytes], client: httpx.A
                  })
         return detected
     except Exception as e:
-        print(f"HF Detection Error: {e}")
+        logger.error(f"HF Detection Error: {e}")
         return []
 
 async def detect_illegal_parking_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
@@ -212,7 +216,7 @@ async def detect_illegal_parking_clip(image: Union[Image.Image, bytes], client: 
                  })
         return detected
     except Exception as e:
-        print(f"HF Detection Error: {e}")
+        logger.error(f"HF Detection Error: {e}")
         return []
 
 async def detect_street_light_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
@@ -238,7 +242,7 @@ async def detect_street_light_clip(image: Union[Image.Image, bytes], client: htt
                  })
         return detected
     except Exception as e:
-        print(f"HF Detection Error: {e}")
+        logger.error(f"HF Detection Error: {e}")
         return []
 
 async def detect_fire_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
@@ -264,7 +268,7 @@ async def detect_fire_clip(image: Union[Image.Image, bytes], client: httpx.Async
                  })
         return detected
     except Exception as e:
-        print(f"HF Detection Error: {e}")
+        logger.error(f"HF Detection Error: {e}")
         return []
 
 async def detect_stray_animal_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
@@ -290,7 +294,7 @@ async def detect_stray_animal_clip(image: Union[Image.Image, bytes], client: htt
                  })
         return detected
     except Exception as e:
-        print(f"HF Detection Error: {e}")
+        logger.error(f"HF Detection Error: {e}")
         return []
 
 async def detect_blocked_road_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
@@ -316,5 +320,5 @@ async def detect_blocked_road_clip(image: Union[Image.Image, bytes], client: htt
                  })
         return detected
     except Exception as e:
-        print(f"HF Detection Error: {e}")
+        logger.error(f"HF Detection Error: {e}")
         return []
