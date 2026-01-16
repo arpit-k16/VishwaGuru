@@ -26,21 +26,7 @@ from contextlib import asynccontextmanager
 from bot import run_bot
 from pothole_detection import detect_potholes
 from garbage_detection import detect_garbage
-from unified_detection_service import detect_vandalism, detect_flooding, detect_infrastructure, get_detection_status
-from hf_service import (
-    detect_vandalism_clip,
-    detect_flooding_clip,
-    detect_infrastructure_clip,
-    detect_illegal_parking_clip,
-    detect_street_light_clip,
-    detect_fire_clip,
-    detect_stray_animal_clip,
-    detect_blocked_road_clip,
-    detect_tree_hazard_clip,
-    detect_pest_clip,
-    detect_severity_clip,
-    generate_image_caption
-)
+from local_ml_service import detect_vandalism_local, detect_flooding_local, detect_infrastructure_local
 from PIL import Image
 from init_db import migrate_db
 import logging
@@ -231,10 +217,32 @@ async def create_issue(
         )
 
         # Offload blocking DB operations to threadpool
-        await run_in_threadpool(save_issue_db, db, new_issue)
+        saved_issue = await run_in_threadpool(save_issue_db, db, new_issue)
 
-        # Invalidate cache
-        recent_issues_cache.invalidate()
+        # Optimistically update cache to avoid DB query on next homepage load
+        cached_data = recent_issues_cache.get()
+        if cached_data is not None:
+            # Format the new issue to match IssueResponse structure
+            new_issue_dict = IssueResponse(
+                id=saved_issue.id,
+                category=saved_issue.category,
+                description=saved_issue.description[:100] + "..." if len(saved_issue.description) > 100 else saved_issue.description,
+                created_at=saved_issue.created_at,
+                image_path=saved_issue.image_path,
+                status=saved_issue.status,
+                upvotes=saved_issue.upvotes if saved_issue.upvotes is not None else 0,
+                location=saved_issue.location,
+                latitude=saved_issue.latitude,
+                longitude=saved_issue.longitude,
+                action_plan=action_plan_data
+            ).model_dump(mode='json')
+
+            # Prepend to cache and keep top 10
+            updated_cache = [new_issue_dict] + cached_data
+            recent_issues_cache.set(updated_cache[:10])
+        else:
+            # Invalidate cache if it was empty/expired, so next fetch repopulates it
+            recent_issues_cache.invalidate()
 
         return IssueCreateResponse(
             id=new_issue.id,
@@ -364,7 +372,7 @@ async def detect_infrastructure_endpoint(request: Request, image: UploadFile = F
     try:
         # Use shared HTTP client from app state
         client = request.app.state.http_client
-        detections = await detect_infrastructure_clip(image_bytes, client=client)
+        detections = await detect_infrastructure_local(pil_image, client=client)
         return {"detections": detections}
     except Exception as e:
         logger.error(f"Infrastructure detection error: {e}", exc_info=True)
@@ -383,7 +391,7 @@ async def detect_flooding_endpoint(request: Request, image: UploadFile = File(..
     try:
         # Use shared HTTP client from app state
         client = request.app.state.http_client
-        detections = await detect_flooding_clip(image_bytes, client=client)
+        detections = await detect_flooding_local(pil_image, client=client)
         return {"detections": detections}
     except Exception as e:
         logger.error(f"Flooding detection error: {e}", exc_info=True)
@@ -402,7 +410,7 @@ async def detect_vandalism_endpoint(request: Request, image: UploadFile = File(.
     try:
         # Use shared HTTP client from app state
         client = request.app.state.http_client
-        detections = await detect_vandalism_clip(image_bytes, client=client)
+        detections = await detect_vandalism_local(pil_image, client=client)
         return {"detections": detections}
     except Exception as e:
         logger.error(f"Vandalism detection error: {e}", exc_info=True)
