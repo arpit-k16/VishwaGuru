@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { fakeActionPlan } from '../fakeData';
 import { Camera, Image as ImageIcon } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 // Get API URL from environment variable, fallback to relative URL for local dev
 const API_URL = import.meta.env.VITE_API_URL || '';
 
 const ReportForm = ({ setView, setLoading, setError, setActionPlan, loading }) => {
+  const locationState = useLocation().state || {};
   const [formData, setFormData] = useState({
-    description: '',
-    category: 'road',
+    description: locationState.description || '',
+    category: locationState.category || 'road',
     image: null,
     latitude: null,
     longitude: null,
@@ -17,6 +19,32 @@ const ReportForm = ({ setView, setLoading, setError, setActionPlan, loading }) =
   const [gettingLocation, setGettingLocation] = useState(false);
   const [severity, setSeverity] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const [describing, setDescribing] = useState(false);
+
+  const autoDescribe = async () => {
+      if (!formData.image) return;
+      setDescribing(true);
+
+      const uploadData = new FormData();
+      uploadData.append('image', formData.image);
+
+      try {
+          const response = await fetch(`${API_URL}/api/generate-description`, {
+              method: 'POST',
+              body: uploadData
+          });
+          if (response.ok) {
+              const data = await response.json();
+              if (data.description) {
+                  setFormData(prev => ({...prev, description: data.description}));
+              }
+          }
+      } catch (e) {
+          console.error("Auto description failed", e);
+      } finally {
+          setDescribing(false);
+      }
+  };
 
   const analyzeImage = async (file) => {
     if (!file) return;
@@ -104,7 +132,11 @@ const ReportForm = ({ setView, setLoading, setError, setActionPlan, loading }) =
       if (!response.ok) throw new Error('Failed to submit issue');
 
       const data = await response.json();
-      setActionPlan(data.action_plan);
+      if (data.action_plan) {
+        setActionPlan(data.action_plan);
+      } else {
+        setActionPlan({ id: data.id, status: 'generating' });
+      }
       setView('action');
     } catch (err) {
       console.error("Submission failed, using fake action plan", err);
@@ -148,6 +180,16 @@ const ReportForm = ({ setView, setLoading, setError, setActionPlan, loading }) =
               onChange={(e) => setFormData({...formData, description: e.target.value})}
               placeholder="Describe the issue..."
             />
+            {formData.image && (
+                <button
+                    type="button"
+                    onClick={autoDescribe}
+                    disabled={describing}
+                    className="mt-2 text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded hover:bg-purple-200 transition flex items-center gap-1 font-medium"
+                >
+                    {describing ? 'Generating description...' : '✨ Auto-fill description from image'}
+                </button>
+            )}
           </div>
 
           <div>

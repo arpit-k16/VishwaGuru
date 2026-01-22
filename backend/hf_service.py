@@ -1,6 +1,14 @@
+"""
+DEPRECATED: This module is no longer used.
+Please use local_ml_service.py for local ML model-based detection instead of Hugging Face API.
+
+This file is kept for reference purposes only.
+"""
 import os
 import io
 import httpx
+import base64
+from typing import Union, List, Dict, Any
 from PIL import Image
 import asyncio
 import logging
@@ -11,6 +19,7 @@ logger = logging.getLogger(__name__)
 token = os.environ.get("HF_TOKEN")
 headers = {"Authorization": f"Bearer {token}"} if token else {}
 API_URL = "https://api-inference.huggingface.co/models/openai/clip-vit-base-patch32"
+CAPTION_API_URL = "https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large"
 
 async def query_hf_api(image_bytes, labels, client=None):
     """
@@ -23,15 +32,15 @@ async def query_hf_api(image_bytes, labels, client=None):
         return await _make_request(new_client, image_bytes, labels)
 
 async def _make_request(client, image_bytes, labels):
-    import base64
-    image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+    try:
+        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
 
-    payload = {
-        "inputs": image_base64,
-        "parameters": {
-            "candidate_labels": labels
+        payload = {
+            "inputs": image_base64,
+            "parameters": {
+                "candidate_labels": labels
+            }
         }
-    }
 
         try:
             response = await client.post(API_URL, headers=headers, json=payload, timeout=20.0)
@@ -61,9 +70,9 @@ def _prepare_image_bytes(image: Union[Image.Image, bytes]) -> bytes:
     image.save(img_byte_arr, format=fmt)
     return img_byte_arr.getvalue()
 
-async def detect_vandalism_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
+async def generate_image_caption(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
     """
-    Detects vandalism/graffiti using Zero-Shot Image Classification with CLIP (Async).
+    Generates a description for the image using Salesforce BLIP model.
     """
     try:
         labels = ["graffiti", "vandalism", "spray paint", "street art", "clean wall", "public property", "normal street"]
