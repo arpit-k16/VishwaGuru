@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     Building2, MessageCircle, Users, Shield, Star, FileText,
-    Search, Lock, ShoppingCart, User
+    Search, Lock, ShoppingCart, User, ArrowRight
 } from 'lucide-react';
 
 const Landing = () => {
@@ -16,13 +16,13 @@ const Landing = () => {
             opacity: 1,
             transition: {
                 staggerChildren: 0.15,
-                delayChildren: 0.3
+                delayChildren: 0.2
             }
         }
     };
 
     const itemVariants = {
-        hidden: { y: 30, opacity: 0 },
+        hidden: { y: 20, opacity: 0 },
         visible: {
             y: 0,
             opacity: 1,
@@ -35,201 +35,174 @@ const Landing = () => {
     };
 
     const slideInLeft = {
-        hidden: { x: -100, opacity: 0 },
+        hidden: { x: -50, opacity: 0 },
         visible: {
             x: 0,
             opacity: 1,
             transition: {
                 type: 'spring',
                 stiffness: 80,
-                damping: 15
+                damping: 20
             }
         }
     };
 
     const slideInRight = {
-        hidden: { x: 100, opacity: 0 },
+        hidden: { x: 50, opacity: 0 },
         visible: {
             x: 0,
             opacity: 1,
             transition: {
                 type: 'spring',
                 stiffness: 80,
-                damping: 15
+                damping: 20
             }
         }
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+        <div className="min-h-screen bg-[#F8FAFC]">
             {/* Header */}
             <motion.header
-                initial={{ y: -100, opacity: 0 }}
+                initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-                className="bg-white shadow-sm sticky top-0 z-50"
+                transition={{ duration: 0.5 }}
+                className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100"
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-20">
                         {/* Logo */}
-                        <motion.div
-                            whileHover={{ scale: 1.05 }}
-                            className="flex items-center gap-3 cursor-pointer"
-                        >
-                            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
-                                <span className="text-white font-bold text-xl">V</span>
+                        <div className="flex items-center gap-3 cursor-pointer group">
+                            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                                <span className="text-white font-bold text-lg">V</span>
                             </div>
-                            <div>
-                                <h1 className="text-xl font-bold text-gray-800">
-                                    FixMyIndia / <span className="text-blue-600">VishwaGuru</span>
-                                </h1>
-                            </div>
-                        </motion.div>
+                            <h1 className="text-xl font-bold text-gray-800 tracking-tight">
+                                FixMyIndia / <span className="text-blue-600">VishwaGuru</span>
+                            </h1>
+                        </div>
 
                         {/* Right side icons */}
-                        <div className="hidden md:flex items-center gap-4">
-                            <motion.button
-                                whileHover={{ scale: 1.1, rotate: 5 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                            >
-                                <Lock className="w-5 h-5 text-gray-600" />
-                            </motion.button>
-                            <motion.button
-                                whileHover={{ scale: 1.1, rotate: -5 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                            >
-                                <ShoppingCart className="w-5 h-5 text-gray-600" />
-                            </motion.button>
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                            >
-                                <User className="w-5 h-5" />
-                                <span className="font-medium">Gover Hiera</span>
-                            </motion.button>
+                        <div className="hidden md:flex items-center gap-6">
+                            <button className="text-gray-500 hover:text-gray-900 transition-colors">
+                                <Lock className="w-5 h-5" />
+                            </button>
+                            <button className="text-gray-500 hover:text-gray-900 transition-colors">
+                                <ShoppingCart className="w-5 h-5" />
+                            </button>
+                            <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
+                                <span className="text-sm font-medium text-gray-700">Gover Hiera</span>
+                                <div className="w-9 h-9 bg-gray-200 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Gover" alt="Profile" className="w-full h-full" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </motion.header>
 
             {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
                 {/* Hero Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
-                    {/* Left Content */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 mb-24 items-center">
+                    {/* Left Content (5 cols) */}
                     <motion.div
                         variants={slideInLeft}
                         initial="hidden"
                         animate="visible"
-                        className="flex flex-col justify-center space-y-8"
+                        className="lg:col-span-5 space-y-8"
                     >
                         <div className="space-y-6">
-                            <motion.h2
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2 }}
-                                className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-tight"
-                            >
-                                Empowering Citizens
-                                <br />
-                                <span className="text-gray-800">with for Better Governance</span>
-                            </motion.h2>
-                            <motion.p
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.4 }}
-                                className="text-lg md:text-xl text-gray-600 leading-relaxed"
-                            >
-                                Report civic Issues and AI generated complaints Telegram via Telegram Propoweri using estizanis.
-                            </motion.p>
+                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-[1.1] tracking-tight">
+                                Empowering Citizens <br />
+                                <span className="text-gray-400 font-bold">for Better Governance</span>
+                            </h1>
+                            <p className="text-lg text-gray-600 leading-relaxed max-w-lg">
+                                Report civic issues and get AI-generated solutions. Connect with officials via Telegram to actively participate in governance.
+                            </p>
                         </div>
 
                         <motion.button
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.6 }}
-                            whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(59, 130, 246, 0.3)' }}
-                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ scale: 1.02, translateY: -2 }}
+                            whileTap={{ scale: 0.98 }}
                             onClick={() => navigate('/home')}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl transition-all duration-300 w-fit"
+                            className="bg-[#2D60FF] hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-[0_10px_20px_-5px_rgba(37,99,235,0.3)] transition-all duration-300 flex items-center gap-2 group"
                         >
                             Call Action Issue
+                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </motion.button>
                     </motion.div>
 
-                    {/* Right Content */}
+                    {/* Right Content (7 cols) */}
                     <motion.div
                         variants={slideInRight}
                         initial="hidden"
                         animate="visible"
-                        className="space-y-6"
+                        className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-6 relative"
                     >
-                        {/* DepMyIndia Card */}
-                        <motion.div
-                            whileHover={{ scale: 1.02, y: -5 }}
-                            className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 shadow-2xl cursor-pointer"
-                            onClick={() => navigate('/home')}
-                        >
-                            <div className="flex items-center gap-4 text-white">
-                                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                                    <span className="text-2xl">🏛️</span>
-                                </div>
-                                <div className="flex-1">
-                                    <h3 className="font-bold text-lg mb-1">DepMyIndia</h3>
-                                    <p className="text-blue-100 text-sm">Reportg Citizens with generated civic govennante</p>
-                                </div>
-                                <Search className="w-6 h-6 opacity-80" />
-                            </div>
-                        </motion.div>
+                        {/* Decorative background blur */}
+                        <div className="absolute -inset-10 bg-blue-50/50 rounded-full blur-3xl -z-10" />
 
-                        {/* Government Services Card */}
-                        <motion.div
-                            whileHover={{ scale: 1.02, y: -5 }}
-                            className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
-                        >
-                            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-                                <h3 className="font-bold text-gray-800 text-lg">Government Services</h3>
-                                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                                    </svg>
-                                </button>
-                            </div>
-
+                        <div className="space-y-6">
+                            {/* DepMyIndia Card */}
                             <motion.div
-                                whileHover={{ backgroundColor: 'rgb(249 250 251)' }}
-                                className="p-6 cursor-pointer"
+                                whileHover={{ y: -5 }}
                                 onClick={() => navigate('/home')}
+                                className="bg-gradient-to-r from-[#2D60FF] to-[#1E40AF] rounded-3xl p-6 text-white shadow-xl cursor-pointer relative overflow-hidden group"
                             >
-                                <div className="flex items-start gap-4">
-                                    <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
-                                        <MessageCircle className="w-7 h-7 text-white" />
+                                <div className="absolute top-0 right-0 p-4 opacity-20">
+                                    <Search className="w-8 h-8" />
+                                </div>
+                                <div className="flex items-start gap-4 mb-8">
+                                    <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                                        <Building2 className="w-6 h-6" />
                                     </div>
-                                    <div className="flex-1">
-                                        <h4 className="font-bold text-gray-900 text-lg mb-2">Question the Government</h4>
-                                        <p className="text-gray-600 text-sm leading-relaxed">
-                                            Submit queries, demand transparency, and hold officials accountable
-                                        </p>
+                                    <div>
+                                        <h3 className="font-bold text-lg">DepMyIndia</h3>
+                                        <p className="text-blue-100 text-sm opacity-90">Report Citizens with <br /> generated civic governance</p>
+                                    </div>
+                                </div>
+                                <div className="h-1 w-full bg-white/20 rounded-full overflow-hidden">
+                                    <div className="h-full w-2/3 bg-white/40 rounded-full"></div>
+                                </div>
+                            </motion.div>
+
+                            {/* Government Services Card */}
+                            <motion.div
+                                whileHover={{ y: -5 }}
+                                onClick={() => navigate('/home')}
+                                className="bg-white rounded-3xl p-6 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.05)] border border-gray-100 cursor-pointer group"
+                            >
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="font-bold text-gray-800">Government Services</h3>
+                                    <div className="text-gray-400">•••</div>
+                                </div>
+                                <div className="bg-gradient-to-br from-orange-50 to-white border border-orange-100 rounded-2xl p-5 group-hover:border-orange-200 transition-colors">
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <MessageCircle className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-gray-900 mb-1">Question the Government</h4>
+                                            <p className="text-sm text-gray-500 leading-snug">Submit queries, demand transparency, and hold officials accountable</p>
+                                        </div>
                                     </div>
                                 </div>
                             </motion.div>
-                        </motion.div>
+                        </div>
 
-                        {/* Community Image */}
+                        {/* Community Image Card */}
                         <motion.div
-                            whileHover={{ scale: 1.02, y: -5 }}
-                            className="rounded-2xl overflow-hidden shadow-2xl"
+                            whileHover={{ y: -5 }}
+                            className="bg-gray-900 rounded-3xl overflow-hidden shadow-xl h-full min-h-[300px] relative group"
                         >
-                            <div className="relative h-64 bg-gradient-to-br from-green-400 via-blue-500 to-purple-500 flex items-center justify-center">
-                                <div className="absolute inset-0 bg-black/10"></div>
-                                <div className="relative text-center text-white p-6">
-                                    <Users className="w-16 h-16 mx-auto mb-4 opacity-90" />
-                                    <h3 className="text-2xl font-bold mb-2">Community in Action</h3>
-                                    <p className="text-white/90">Citizens working together for a better tomorrow</p>
-                                </div>
+                            <img
+                                src="https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                                alt="Community"
+                                className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity duration-500"
+                            />
+                            <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
+                                <p className="text-white font-medium mb-1">Community Action</p>
+                                <p className="text-gray-300 text-sm">Join the movement</p>
                             </div>
                         </motion.div>
                     </motion.div>
@@ -240,140 +213,112 @@ const Landing = () => {
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
-                    className="space-y-12"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20"
                 >
-                    {/* Feature Cards Row 1 */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <motion.div
-                            variants={itemVariants}
-                            whileHover={{ scale: 1.05, rotate: 1 }}
-                            className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all cursor-pointer border border-gray-100"
-                            onClick={() => navigate('/home')}
-                        >
-                            <div className="text-center space-y-4">
-                                <div className="w-20 h-20 bg-gray-100 rounded-2xl mx-auto flex items-center justify-center">
-                                    <Building2 className="w-10 h-10 text-gray-700" />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-gray-900 mb-1">Public Trust</h3>
-                                    <p className="text-gray-600 text-sm">& Ethics</p>
-                                </div>
-                            </div>
-                        </motion.div>
-
-                        <motion.div
-                            variants={itemVariants}
-                            whileHover={{ scale: 1.05, rotate: -1 }}
-                            className="bg-green-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all cursor-pointer border border-green-200"
-                            onClick={() => navigate('/home')}
-                        >
-                            <div className="text-center space-y-4">
-                                <div className="w-20 h-20 bg-green-600 rounded-2xl mx-auto flex items-center justify-center">
-                                    <MessageCircle className="w-10 h-10 text-white" />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-gray-900">Civic Issues</h3>
-                                </div>
-                            </div>
-                        </motion.div>
-
-                        <motion.div
-                            variants={itemVariants}
-                            whileHover={{ scale: 1.05, rotate: 1 }}
-                            className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all cursor-pointer border border-gray-100"
-                            onClick={() => navigate('/home')}
-                        >
-                            <div className="text-center space-y-4">
-                                <div className="w-20 h-20 bg-blue-100 rounded-2xl mx-auto flex items-center justify-center">
-                                    <Star className="w-10 h-10 text-blue-600" />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-gray-900 mb-1">VoiceYour Vote</h3>
-                                    <p className="text-gray-600 text-xs">Wic carres sedious<br />Share idea for bettarpolicies</p>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </div>
-
-                    {/* AI Section Title */}
+                    {/* Feature 1 */}
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 1.2 }}
-                        className="text-center"
+                        variants={itemVariants}
+                        whileHover={{ y: -5 }}
+                        className="bg-white p-8 rounded-3xl border border-gray-100 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] text-center group cursor-pointer"
+                        onClick={() => navigate('/home')}
                     >
-                        <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-2">
-                            AI al for Democracy & Civic Actions
-                        </h2>
-                        <p className="text-gray-600">Layee Therm:</p>
+                        <div className="w-16 h-16 mx-auto mb-6 relative">
+                            <div className="absolute inset-0 bg-gray-100 rounded-2xl transform rotate-3 group-hover:rotate-12 transition-transform"></div>
+                            <div className="absolute inset-0 bg-white border-2 border-gray-100 rounded-2xl flex items-center justify-center relative z-10">
+                                <Building2 className="w-8 h-8 text-gray-700" />
+                            </div>
+                        </div>
+                        <h3 className="font-bold text-gray-900 mb-1">Public Trust</h3>
+                        <p className="text-gray-500 text-sm">& Ethics</p>
                     </motion.div>
 
-                    {/* AI Feature Cards */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                        <motion.div
-                            variants={itemVariants}
-                            whileHover={{ scale: 1.05 }}
-                            className="bg-blue-600 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all cursor-pointer text-white"
-                            onClick={() => navigate('/home')}
-                        >
-                            <div className="text-center space-y-3">
-                                <Star className="w-12 h-12 mx-auto" />
-                                <h4 className="font-bold">Smart Solutions</h4>
-                            </div>
-                        </motion.div>
+                    {/* Feature 2 (Green) */}
+                    <motion.div
+                        variants={itemVariants}
+                        whileHover={{ y: -5 }}
+                        className="bg-[#4ADE80] p-8 rounded-3xl shadow-[0_10px_30px_-10px_rgba(74,222,128,0.4)] text-center group cursor-pointer relative overflow-hidden"
+                        onClick={() => navigate('/home')}
+                    >
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-2xl -mr-8 -mt-8"></div>
+                        <div className="w-16 h-16 mx-auto mb-6 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm shadow-inner">
+                            <MessageCircle className="w-8 h-8 text-white" />
+                        </div>
+                        <h3 className="font-bold text-white text-lg">Civic Issues</h3>
+                        <p className="text-white/80 text-sm mt-1">Report problems</p>
+                    </motion.div>
 
-                        <motion.div
-                            variants={itemVariants}
-                            whileHover={{ scale: 1.05 }}
-                            className="bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all cursor-pointer text-white"
-                            onClick={() => navigate('/home')}
-                        >
-                            <div className="text-center space-y-3">
-                                <Users className="w-12 h-12 mx-auto" />
-                                <h4 className="font-bold">Community</h4>
-                            </div>
-                        </motion.div>
+                    {/* Feature 3 */}
+                    <motion.div
+                        variants={itemVariants}
+                        whileHover={{ y: -5 }}
+                        className="bg-white p-8 rounded-3xl border border-gray-100 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] text-center cursor-pointer"
+                        onClick={() => navigate('/home')}
+                    >
+                        <div className="w-16 h-16 mx-auto mb-6 bg-blue-50 border border-blue-100 rounded-2xl flex items-center justify-center">
+                            <Star className="w-8 h-8 text-blue-600" />
+                        </div>
+                        <h3 className="font-bold text-gray-900 mb-1">Voice Your Vote</h3>
+                        <p className="text-gray-500 text-xs">Share ideas for better policies</p>
+                    </motion.div>
 
-                        <motion.div
-                            variants={itemVariants}
-                            whileHover={{ scale: 1.05 }}
-                            className="bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all cursor-pointer"
-                            onClick={() => navigate('/home')}
-                        >
-                            <div className="text-center space-y-3">
-                                <FileText className="w-12 h-12 mx-auto text-gray-800" />
-                                <h4 className="font-bold text-gray-800">Transparency</h4>
-                            </div>
-                        </motion.div>
-
-                        <motion.div
-                            variants={itemVariants}
-                            whileHover={{ scale: 1.05 }}
-                            className="bg-orange-600 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all cursor-pointer text-white"
-                            onClick={() => navigate('/home')}
-                        >
-                            <div className="text-center space-y-3">
-                                <Shield className="w-12 h-12 mx-auto" />
-                                <h4 className="font-bold">Security</h4>
-                            </div>
-                        </motion.div>
-                    </div>
+                    {/* AI Header (Span 4th col) */}
+                    <motion.div
+                        variants={itemVariants}
+                        className="space-y-4 flex flex-col justify-center pl-4"
+                    >
+                        <h2 className="text-2xl font-bold text-gray-900 leading-tight">
+                            AI for Democracy <br /> & Civic Actions
+                        </h2>
+                        <p className="text-gray-500 text-sm">
+                            Leveraging technology for transparent governance and faster resolutions.
+                        </p>
+                    </motion.div>
                 </motion.div>
+
+                {/* AI Features Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        className="bg-[#2D60FF] p-5 rounded-2xl flex flex-col items-center justify-center text-white aspect-square cursor-pointer shadow-lg shadow-blue-500/20"
+                        onClick={() => navigate('/home')}
+                    >
+                        <Star className="w-8 h-8 mb-3" />
+                        <span className="font-bold text-sm">Smart Solns</span>
+                    </motion.div>
+
+                    <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        className="bg-white border border-gray-100 p-5 rounded-2xl flex flex-col items-center justify-center text-gray-600 aspect-square cursor-pointer hover:shadow-lg transition-shadow"
+                        onClick={() => navigate('/home')}
+                    >
+                        <Users className="w-8 h-8 mb-3" />
+                        <span className="font-bold text-sm">Community</span>
+                    </motion.div>
+
+                    <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        className="bg-white border border-gray-100 p-5 rounded-2xl flex flex-col items-center justify-center text-gray-800 aspect-square cursor-pointer hover:shadow-lg transition-shadow"
+                        onClick={() => navigate('/home')}
+                    >
+                        <Shield className="w-8 h-8 mb-3" />
+                        <span className="font-bold text-sm">Transparecy</span>
+                    </motion.div>
+
+                    <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        className="bg-[#F97316] p-5 rounded-2xl flex flex-col items-center justify-center text-white aspect-square cursor-pointer shadow-lg shadow-orange-500/20"
+                        onClick={() => navigate('/home')}
+                    >
+                        <FileText className="w-8 h-8 mb-3" />
+                        <span className="font-bold text-sm">Reports</span>
+                    </motion.div>
+                </div>
             </div>
 
-            {/* Footer */}
-            <motion.footer
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.5 }}
-                className="bg-gray-900 text-white py-12 mt-20"
-            >
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <p className="text-gray-400">
-                        &copy; {new Date().getFullYear()} VishwaGuru Civic Platform. All rights reserved.
-                    </p>
-                </div>
-            </motion.footer>
+            {/* Simple Footer */}
+            <div className="text-center py-8 text-gray-400 text-sm border-t border-gray-100 mt-12">
+                © 2024 VishwaGuru. All rights reserved.
+            </div>
         </div>
     );
 };
