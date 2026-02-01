@@ -6,7 +6,7 @@ Successfully created a stunning landing page that replicates the design referenc
 ## ✨ What Was Implemented
 
 ### 1. **New Landing Page Component** (`frontend/src/views/Landing.jsx`)
-- **Modern, Responsive Design**: Pixel-perfect replication of the reference design
+- **Modern, Responsive Design**: Pixel-perfect replication of the reference design and
 - **Hero Section**: 
   - Compelling headline: "Empowering Citizens for Better Governance"
   - Descriptive subtitle about AI-powered civic solutions
