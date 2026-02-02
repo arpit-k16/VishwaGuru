@@ -3,9 +3,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from contextlib import asynccontextmanager
 import os
+import sys
+from pathlib import Path
 import httpx
 import logging
 from datetime import datetime, timezone
+
+# Add parent directory to sys.path to ensure 'backend.*' imports work
+# even if run from inside the backend directory or with PYTHONPATH issues.
+root_dir = str(Path(__file__).parent.parent)
+if root_dir not in sys.path:
+    sys.path.append(root_dir)
 
 from backend.database import engine, Base
 from backend.exceptions import EXCEPTION_HANDLERS
@@ -107,12 +115,17 @@ for exception_type, handler in EXCEPTION_HANDLERS.items():
 
 # CORS Configuration - Security Enhanced
 frontend_url = os.environ.get("FRONTEND_URL")
+is_production = os.environ.get("ENVIRONMENT", "").lower() == "production"
+
 if not frontend_url:
-    raise ValueError(
-        "FRONTEND_URL environment variable is required for security. "
-        "Set it to your frontend URL (e.g., https://your-app.netlify.app). "
-        "For development, use http://localhost:5173 or similar."
-    )
+    if is_production:
+        raise ValueError(
+            "FRONTEND_URL environment variable is required for security in production. "
+            "Set it to your frontend URL (e.g., https://your-app.netlify.app)."
+        )
+    else:
+        logger.warning("FRONTEND_URL not set. Defaulting to http://localhost:5173 for development.")
+        frontend_url = "http://localhost:5173"
 
 if not (frontend_url.startswith("http://") or frontend_url.startswith("https://")):
     raise ValueError(
