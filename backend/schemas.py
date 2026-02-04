@@ -11,6 +11,9 @@ class ActionPlan(BaseModel):
 class ChatRequest(BaseModel):
     query: str
 
+class GrievanceRequest(BaseModel):
+    text: str
+
 class IssueResponse(BaseModel):
     id: int
     category: str

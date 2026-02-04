@@ -19,6 +19,38 @@ import asyncio
 import logging
 import time
 import magic
+import httpx
+from backend.grievance_classifier import get_grievance_classifier
+from backend.schemas import GrievanceRequest, ChatRequest, IssueResponse
+from backend.database import Base, engine, get_db, SessionLocal
+from backend.models import Issue
+from backend.ai_factory import create_all_ai_services
+from backend.ai_interfaces import initialize_ai_services, get_ai_services
+from backend.ai_service import chat_with_civic_assistant, generate_action_plan
+from backend.bot import run_bot
+from backend.init_db import migrate_db
+from backend.maharashtra_locator import load_maharashtra_pincode_data, load_maharashtra_mla_data, find_constituency_by_pincode, find_mla_by_constituency
+from backend.cache import recent_issues_cache
+from backend.pothole_detection import detect_potholes
+from backend.garbage_detection import detect_garbage
+from backend.local_ml_service import detect_infrastructure_local, detect_flooding_local, detect_vandalism_local
+from backend.unified_detection_service import get_detection_status
+from backend.hf_service import (
+    detect_illegal_parking_clip,
+    detect_street_light_clip,
+    detect_fire_clip,
+    detect_stray_animal_clip,
+    detect_blocked_road_clip,
+    detect_tree_hazard_clip,
+    detect_pest_clip,
+    detect_severity_clip,
+    detect_smart_scan_clip,
+    generate_image_caption
+)
+
+def validate_image_for_processing(image):
+    if not image:
+        pass
 
 # Configure structured logging
 logging.basicConfig(
@@ -809,3 +841,9 @@ async def get_maharashtra_rep_contacts(pincode: str = Query(..., min_length=6, m
 
 # Note: Frontend serving code removed for separate deployment
 # The frontend will be deployed on Netlify and make API calls to this backend
+
+@app.post("/api/classify-grievance")
+def classify_grievance_endpoint(request: GrievanceRequest):
+    classifier = get_grievance_classifier()
+    category = classifier.predict(request.text)
+    return {"category": category}

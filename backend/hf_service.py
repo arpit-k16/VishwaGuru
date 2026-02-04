@@ -151,3 +151,30 @@ async def detect_flooding_clip(image: Union[Image.Image, bytes], client: httpx.A
     except Exception as e:
         logger.error(f"HF Detection Error: {e}")
         return []
+
+async def detect_illegal_parking_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
+    return []
+
+async def detect_street_light_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
+    return []
+
+async def detect_fire_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
+    return []
+
+async def detect_stray_animal_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
+    return []
+
+async def detect_blocked_road_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
+    return []
+
+async def detect_tree_hazard_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
+    return []
+
+async def detect_pest_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
+    return []
+
+async def detect_severity_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
+    return {"severity": "Low", "score": 0.0}
+
+async def detect_smart_scan_clip(image: Union[Image.Image, bytes], client: httpx.AsyncClient = None):
+    return {"category": "Unknown", "confidence": 0.0}

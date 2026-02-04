@@ -177,6 +177,16 @@ const Home = ({ setView, fetchResponsibilityMap, recentIssues, handleUpvote }) =
         </div>
         <span className="font-semibold text-amber-900 text-sm">Pest Control</span>
       </button>
+
+      <button
+        onClick={() => setView('grievance-analysis')}
+        className="flex flex-col items-center justify-center bg-teal-50 border-2 border-teal-100 p-4 rounded-xl hover:bg-teal-100 transition shadow-sm h-32"
+      >
+        <div className="bg-teal-600 text-white p-3 rounded-full mb-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><path d="M13 8H7"></path><path d="M17 12H7"></path></svg>
+        </div>
+        <span className="font-semibold text-teal-800 text-sm">Analyze Grievance</span>
+      </button>
     </div>
 
     <div className="grid grid-cols-1 mt-4">
