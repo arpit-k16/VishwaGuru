@@ -11,6 +11,7 @@ from functools import lru_cache
 from typing import List, Union, Any, Dict, Optional
 from datetime import datetime, timedelta, timezone
 from PIL import Image
+import mimetypes
 
 import json
 import os
@@ -22,7 +23,10 @@ import io
 import hashlib
 import time
 from pywebpush import webpush, WebPushException
-import magic
+try:
+    import magic
+except ImportError:
+    magic = None
 import httpx
 from async_lru import alru_cache
 
@@ -92,6 +96,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+if magic is None:
+    logger.warning(
+        "python-magic is not available; falling back to content_type and "
+        "mimetypes-based detection for uploads."
+    )
+
 # Shared HTTP Client for cached functions
 SHARED_HTTP_CLIENT: Optional[httpx.AsyncClient] = None
 
@@ -155,60 +165,69 @@ def _validate_uploaded_file_sync(file: UploadFile) -> None:
             detail=f"File too large. Maximum size allowed is {MAX_FILE_SIZE // (1024*1024)}MB"
         )
     
-    # Check MIME type from content using python-magic
+    # Check MIME type from content using python-magic when available
+    detected_mime: Optional[str] = None
     try:
-        # Read first 1024 bytes for MIME detection
-        file_content = file.file.read(1024)
-        file.file.seek(0)  # Reset file pointer
-        
-        detected_mime = magic.from_buffer(file_content, mime=True)
-        
-        if detected_mime not in ALLOWED_MIME_TYPES:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Invalid file type. Only image files are allowed. Detected: {detected_mime}"
-            )
-        
-        # Additional content validation: Try to open with PIL to ensure it's a valid image
-        try:
-            img = Image.open(file.file)
-            img.verify()  # Verify the image is not corrupted
-            file.file.seek(0)  # Reset after PIL operations
-            
-            # Resize large images for better performance
-            img = Image.open(file.file)
-            if img.width > 1024 or img.height > 1024:
-                # Calculate new size maintaining aspect ratio
-                ratio = min(1024 / img.width, 1024 / img.height)
-                new_width = int(img.width * ratio)
-                new_height = int(img.height * ratio)
-                
-                img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
-                
-                # Save resized image back to file
-                output = io.BytesIO()
-                img.save(output, format=img.format or 'JPEG', quality=85)
-                output.seek(0)
-                
-                # Replace file content
-                file.file = output
-                file.size = output.tell()
-                output.seek(0)
-                
-        except Exception as pil_error:
-            logger.error(f"PIL validation failed for {file.filename}: {pil_error}")
-            raise HTTPException(
-                status_code=400,
-                detail="Invalid image file. The file appears to be corrupted or not a valid image."
-            )
-            
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error validating file {file.filename}: {e}")
+        if magic is not None:
+            # Read first 1024 bytes for MIME detection
+            file_content = file.file.read(1024)
+            file.file.seek(0)  # Reset file pointer
+            detected_mime = magic.from_buffer(file_content, mime=True)
+    except Exception as mime_error:
+        logger.warning(
+            f"MIME detection via python-magic failed for {file.filename}: {mime_error}. "
+            "Falling back to content_type/mimetypes.",
+            exc_info=True,
+        )
+        file.file.seek(0)
+
+    if not detected_mime:
+        # Fallback: trust FastAPI's content_type header or guess from filename
+        detected_mime = file.content_type or mimetypes.guess_type(file.filename or "")[0]
+
+    if not detected_mime:
         raise HTTPException(
             status_code=400,
-            detail="Unable to validate file content. Please ensure it's a valid image file."
+            detail="Unable to detect file type. Only image files are allowed."
+        )
+
+    if detected_mime not in ALLOWED_MIME_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file type. Only image files are allowed. Detected: {detected_mime}"
+        )
+
+    # Additional content validation: Try to open with PIL to ensure it's a valid image
+    try:
+        img = Image.open(file.file)
+        img.verify()  # Verify the image is not corrupted
+        file.file.seek(0)  # Reset after PIL operations
+
+        # Resize large images for better performance
+        img = Image.open(file.file)
+        if img.width > 1024 or img.height > 1024:
+            # Calculate new size maintaining aspect ratio
+            ratio = min(1024 / img.width, 1024 / img.height)
+            new_width = int(img.width * ratio)
+            new_height = int(img.height * ratio)
+
+            img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
+            # Save resized image back to file
+            output = io.BytesIO()
+            img.save(output, format=img.format or 'JPEG', quality=85)
+            output.seek(0)
+
+            # Replace file content
+            file.file = output
+            file.size = output.tell()
+            output.seek(0)
+
+    except Exception as pil_error:
+        logger.error(f"PIL validation failed for {file.filename}: {pil_error}")
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid image file. The file appears to be corrupted or not a valid image."
         )
 
 async def validate_uploaded_file(file: UploadFile) -> None:
