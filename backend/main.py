@@ -216,12 +216,14 @@ def _validate_uploaded_file_sync(file: UploadFile) -> None:
             # Save resized image back to file
             output = io.BytesIO()
             img.save(output, format=img.format or 'JPEG', quality=85)
+
+            # Record the correct size before rewinding buffer
+            resized_size = output.tell()
             output.seek(0)
 
             # Replace file content
             file.file = output
-            file.size = output.tell()
-            output.seek(0)
+            file.size = resized_size
 
     except Exception as pil_error:
         logger.error(f"PIL validation failed for {file.filename}: {pil_error}")
