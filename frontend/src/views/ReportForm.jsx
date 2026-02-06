@@ -16,6 +16,7 @@ const ReportForm = ({ setView, setLoading, setError, setActionPlan, loading }) =
   const [formData, setFormData] = useState({
     description: locationState.description || '',
     category: locationState.category || 'road',
+    email: localStorage.getItem('user_email') || '',
     image: null,
     latitude: null,
     longitude: null,
@@ -442,6 +443,18 @@ const ReportForm = ({ setView, setLoading, setError, setActionPlan, loading }) =
                     </div>
                 </div>
             )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Email (Optional)</label>
+            <input
+              type="email"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+              placeholder="Enter your email to track your reports"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+            />
+            <p className="text-xs text-gray-500 mt-1">We'll use this to group your reports under "My Reports".</p>
           </div>
 
           <div>

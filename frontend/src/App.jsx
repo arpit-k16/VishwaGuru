@@ -32,6 +32,9 @@ const TreeDetector = React.lazy(() => import('./TreeDetector'));
 const PestDetector = React.lazy(() => import('./PestDetector'));
 const SmartScanner = React.lazy(() => import('./SmartScanner'));
 const GrievanceAnalysis = React.lazy(() => import('./views/GrievanceAnalysis'));
+const NoiseDetector = React.lazy(() => import('./NoiseDetector'));
+const CivicEyeDetector = React.lazy(() => import('./CivicEyeDetector'));
+const MyReportsView = React.lazy(() => import('./views/MyReportsView'));
 
 // Create a wrapper component to handle state management
 function AppContent() {
@@ -49,7 +52,7 @@ function AppContent() {
 
   // Safe navigation helper
   const navigateToView = (view) => {
-    const validViews = ['home', 'map', 'report', 'action', 'mh-rep', 'pothole', 'garbage', 'vandalism', 'flood', 'infrastructure', 'parking', 'streetlight', 'fire', 'animal', 'blocked', 'tree', 'pest', 'smart-scan', 'grievance-analysis'];
+    const validViews = ['home', 'map', 'report', 'action', 'mh-rep', 'pothole', 'garbage', 'vandalism', 'flood', 'infrastructure', 'parking', 'streetlight', 'fire', 'animal', 'blocked', 'tree', 'pest', 'smart-scan', 'grievance-analysis', 'noise', 'safety-check', 'my-reports'];
     if (validViews.includes(view)) {
       navigate(view === 'home' ? '/' : `/${view}`);
     }
@@ -268,6 +271,16 @@ function AppContent() {
             <Route path="/pest" element={<PestDetector onBack={() => navigate('/')} />} />
             <Route path="/smart-scan" element={<SmartScanner onBack={() => navigate('/')} />} />
             <Route path="/grievance-analysis" element={<GrievanceAnalysis onBack={() => navigate('/')} />} />
+            <Route path="/noise" element={<NoiseDetector onBack={() => navigate('/')} />} />
+            <Route path="/safety-check" element={
+              <div className="flex flex-col h-full p-4">
+                <button onClick={() => navigate('/')} className="self-start text-blue-600 mb-2 font-bold">
+                  &larr; Back
+                </button>
+                <CivicEyeDetector onBack={() => navigate('/')} />
+              </div>
+            } />
+            <Route path="/my-reports" element={<MyReportsView />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

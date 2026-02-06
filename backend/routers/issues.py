@@ -478,6 +478,37 @@ def subscribe_push_notifications(
         message="Push subscription created"
     )
 
+@router.get("/api/issues/user", response_model=List[IssueSummaryResponse])
+def get_user_issues(
+    user_email: str = Query(..., description="Email of the user"),
+    limit: int = Query(10, ge=1, le=50, description="Number of issues to return"),
+    offset: int = Query(0, ge=0, description="Number of issues to skip"),
+    db: Session = Depends(get_db)
+):
+    """
+    Get issues reported by a specific user (identified by email).
+    """
+    issues = db.query(Issue).filter(Issue.user_email == user_email)\
+        .options(defer(Issue.action_plan))\
+        .order_by(Issue.created_at.desc())\
+        .offset(offset).limit(limit).all()
+
+    return [
+        IssueSummaryResponse(
+            id=i.id,
+            category=i.category,
+            description=i.description[:100] + "..." if len(i.description) > 100 else i.description,
+            created_at=i.created_at,
+            image_path=i.image_path,
+            status=i.status,
+            upvotes=i.upvotes if i.upvotes is not None else 0,
+            location=i.location,
+            latitude=i.latitude,
+            longitude=i.longitude
+        ).model_dump(mode='json')
+        for i in issues
+    ]
+
 @router.get("/api/issues/recent", response_model=List[IssueSummaryResponse])
 def get_recent_issues(
     limit: int = Query(10, ge=1, le=50, description="Number of issues to return"),
